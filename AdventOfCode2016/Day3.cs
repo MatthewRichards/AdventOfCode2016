@@ -10,10 +10,24 @@ namespace AdventOfCode2016
   {
     static void Main(string[] args)
     {
-      var triangles = Input.SplitLines()
-        .Select(line => line.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries))
-        .Select(sides => new Triangle(int.Parse(sides[0]), int.Parse(sides[1]), int.Parse(sides[2])));
+      var lines = Input.SplitLines().Select(line => line.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries)).ToList();
 
+      var groupsOfLines = lines.Aggregate(
+        Tuple.Create(Enumerable.Empty<Tuple<string[], string[], string[]>>(), Enumerable.Empty<string[]>()),
+        (acc, line) => acc.Item2.Count() == 2
+          ? Tuple.Create(acc.Item1.Union(new[] {Tuple.Create(acc.Item2.First(), acc.Item2.Last(), line)}),
+            Enumerable.Empty<string[]>())
+          : Tuple.Create(acc.Item1, acc.Item2.Union(new[] {line})))
+        .Item1;
+
+      var triangles = groupsOfLines.SelectMany(
+        group => new[]
+        {
+          new Triangle(int.Parse(group.Item1[0]), int.Parse(group.Item2[0]), int.Parse(group.Item3[0])),
+          new Triangle(int.Parse(group.Item1[1]), int.Parse(group.Item2[1]), int.Parse(group.Item3[1])),
+          new Triangle(int.Parse(group.Item1[2]), int.Parse(group.Item2[2]), int.Parse(group.Item3[2]))
+        });
+      
       Console.WriteLine(triangles.Count(t => t.IsPossible()));
       
       Console.ReadKey();
