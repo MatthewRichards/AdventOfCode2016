@@ -20,7 +20,7 @@ namespace AdventOfCode2016
       foreach (var room in rooms)
       {
         var name = room.Item1;
-        var sector = room.Item2;
+        var sector = int.Parse(room.Item2);
         var checksum = room.Item3;
         var freqs = new int[26];
 
@@ -36,11 +36,15 @@ namespace AdventOfCode2016
 
         if (checksum == string.Join("", sortedLetters.Take(5)))
         {
-          sumOfSectors += int.Parse(sector);
+          var decryptedName = string.Join("", name.Select(c => (char)('a' + (((c - 'a') + sector)%26))));
+
+          if (decryptedName.Contains("north"))
+          {
+            Console.WriteLine($"{decryptedName} ({sector})");
+          }
         }
       }
 
-      Console.WriteLine(sumOfSectors);
       Console.ReadKey();
     }
 
