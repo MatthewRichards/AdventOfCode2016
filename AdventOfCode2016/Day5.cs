@@ -14,11 +14,12 @@ namespace AdventOfCode2016
     static void Main()
     {
       const string doorId = "ojvtpuvg";
-      var password = "";
+      var password = new char[8];
       var index = 0;
+      var found = 0;
       var md5 = new MD5CryptoServiceProvider();
 
-      while (password.Length < 8)
+      while (found < 8)
       {
         var stringToHash = doorId + index;
         var bytesToHash = Encoding.ASCII.GetBytes(stringToHash);
@@ -26,16 +27,21 @@ namespace AdventOfCode2016
 
         if (hashedBytes[0] == 0 && hashedBytes[1] == 0 && ((hashedBytes[2] & 0x0F) == hashedBytes[2]))
         {
-          // First five hex digits are 0, so take the sixth hex digit and add to the password
-          var hexDigit = "0123456789abcdef"[hashedBytes[2]];
-          password += hexDigit;
-          Console.WriteLine(password);
+          var position = hashedBytes[2];
+
+          if (position <= 7 && password[position] == '\0')
+          {
+            var hexDigit = "0123456789abcdef"[hashedBytes[3]/0x10];
+            password[position] = hexDigit;
+            found++;
+            Console.WriteLine(string.Join("", password));
+          }
         }
 
         index++;
       }
 
-      Console.WriteLine(password);
+      Console.WriteLine(string.Join("", password));
       Console.ReadKey();
     }
   }

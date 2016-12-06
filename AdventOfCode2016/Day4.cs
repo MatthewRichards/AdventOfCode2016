@@ -15,8 +15,6 @@ namespace AdventOfCode2016
         .Select(line => Matcher.Match(line))
         .Select(match => Tuple.Create(match.Groups["name"].Value, match.Groups["sector"].Value, match.Groups["checksum"].Value));
 
-      int sumOfSectors = 0;
-
       foreach (var room in rooms)
       {
         var name = room.Item1;
