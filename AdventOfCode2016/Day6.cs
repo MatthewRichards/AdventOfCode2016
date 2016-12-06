@@ -34,7 +34,7 @@ namespace AdventOfCode2016
         }
       }
 
-      var message = string.Join("", freqs.Select(dict => dict.OrderByDescending(kv => kv.Value).First().Key));
+      var message = string.Join("", freqs.Select(dict => dict.OrderBy(kv => kv.Value).First().Key));
       Console.WriteLine(message);
       Console.ReadKey();
     }
