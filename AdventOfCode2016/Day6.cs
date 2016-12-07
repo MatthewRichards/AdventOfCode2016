@@ -11,7 +11,7 @@ namespace AdventOfCode2016
 {
   class Day6
   {
-    static void Main()
+    static void Main6()
     {
       var lines = Input.SplitLines().ToList();
       var freqs = Enumerable.Range(0, lines[0].Length).Select(_ => new Dictionary<char, int>()).ToArray();
