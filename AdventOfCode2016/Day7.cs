@@ -13,9 +13,42 @@ namespace AdventOfCode2016
   {
     static void Main()
     {
+      var examples = Examples.SplitLines();
+      examples.Where(IsSSL).ToList().ForEach(Console.WriteLine);
+
       var ips = Input.SplitLines();
-      Console.WriteLine(ips.Count(IsTLS));
+      Console.WriteLine(ips.Count(IsSSL));
       Console.ReadKey();
+    }
+
+    private static bool IsSSL(string ip)
+    {
+      bool inHypernetSequence = false;
+      var abaList = new HashSet<Tuple<char, char>>();
+      var babList = new HashSet<Tuple<char, char>>();
+
+      for (int i = 0; i < ip.Length - 2; i++)
+      {
+        if (ip[i] == '[')
+        {
+          inHypernetSequence = true;
+        }
+        else if (ip[i] == ']')
+        {
+          inHypernetSequence = false;
+        }
+        else
+        {
+          if (ip[i] == ip[i + 2] && ip[i] != ip[i + 1])
+          {
+            // ABA or BAB
+            (inHypernetSequence ? abaList : babList).Add(Tuple.Create(ip[i], ip[i + 1]));
+          }
+        }
+      }
+
+      return abaList.Any(
+        aba => babList.Contains(Tuple.Create(aba.Item2, aba.Item1)));
     }
 
     private static bool IsTLS(string ip)
@@ -50,6 +83,11 @@ namespace AdventOfCode2016
 
       return hasAbba;
     }
+
+    private const string Examples = @"aba[bab]xyz
+xyx[xyx]xyx
+aaa[kek]eke
+zazbz[bzb]cdb";
 
     private const string Input = @"wysextplwqpvipxdv[srzvtwbfzqtspxnethm]syqbzgtboxxzpwr[kljvjjkjyojzrstfgrw]obdhcczonzvbfby[svotajtpttohxsh]cooktbyumlpxostt
 emzopymywhhxulxuctj[dwwvkzhoigmbmnf]nxgbgfwqvrypqxppyq[qozsihnhpztcrpbdc]rnhnakmrdcowatw[rhvchmzmyfxlolwe]uysecbspabtauvmixa
