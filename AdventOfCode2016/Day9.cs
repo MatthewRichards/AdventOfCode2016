@@ -11,7 +11,7 @@ namespace AdventOfCode2016
 {
   internal class Day9
   {
-    private static void Main()
+    private static void Main9()
     {
       var length = GetDecompressedLength(Input);
 
