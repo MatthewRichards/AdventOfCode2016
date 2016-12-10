@@ -20,15 +20,9 @@ namespace AdventOfCode2016
         .ToList()
         .ForEach(match => factory.AddInstruction(match));
 
-      while (factory.ActAllBots())
-      {
-        if (factory.Bots.Any(bot => bot.Value.Values.Contains(61) && bot.Value.Values.Contains(17)))
-        {
-          break;
-        }
-      }
+      while (factory.ActAllBots()) continue;
 
-      Console.WriteLine(factory.Bots.Single(bot => bot.Value.Values.Contains(61) && bot.Value.Values.Contains(17)).Key);
+      Console.Out.WriteLine(factory.GetOutput(0).Value * factory.GetOutput(1).Value * factory.GetOutput(2).Value);
 
       Console.ReadKey();
     }
