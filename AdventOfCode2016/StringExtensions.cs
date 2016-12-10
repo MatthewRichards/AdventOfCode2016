@@ -10,7 +10,7 @@ namespace AdventOfCode2016
   {
     public static IEnumerable<string> SplitLines(this string input)
     {
-      return input.Split(new[] {Environment.NewLine}, StringSplitOptions.None);
+      return input.Split(new[] {Environment.NewLine, "\n"}, StringSplitOptions.None);
     } 
   }
 }

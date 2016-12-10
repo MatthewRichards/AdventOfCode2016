@@ -11,7 +11,7 @@ namespace AdventOfCode2016
 {
   internal class Day10
   {
-    private static void Main()
+    private static void Main10()
     {
       var factory = new Factory();
 
