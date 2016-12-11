@@ -12,7 +12,7 @@ namespace AdventOfCode2016
 {
   internal class TubeNames
   {
-    private static void Main()
+    private static void MainTube()
     {
       // This has absolutely nothing to do with Advent of Code. I was just too lazy to create a new repo.
 
