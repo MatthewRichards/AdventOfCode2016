@@ -59,7 +59,9 @@ namespace AdventOfCode2016
       Plutonium,
       Thulium,
       Ruthenium,
-      Curium
+      Curium,
+      Elerium,
+      Dilithium
     }
 
     public class Thing
@@ -119,7 +121,9 @@ namespace AdventOfCode2016
               new Generator { Element = Element.Plutonium, Floor = 1 },
               new Generator { Element = Element.Thulium, Floor = 2 },
               new Generator { Element = Element.Ruthenium, Floor = 2 },
-              new Generator { Element = Element.Curium, Floor = 2 }
+              new Generator { Element = Element.Curium, Floor = 2 },
+              new Generator { Element = Element.Elerium, Floor = 1 },
+              new Generator { Element = Element.Dilithium, Floor = 1 }
             },
             Microchips = new[]
             {
@@ -127,7 +131,9 @@ namespace AdventOfCode2016
               new Microchip { Element = Element.Plutonium, Floor = 1 },
               new Microchip { Element = Element.Ruthenium, Floor = 2 },
               new Microchip { Element = Element.Curium, Floor = 2 },
-              new Microchip { Element = Element.Thulium, Floor = 3 }
+              new Microchip { Element = Element.Thulium, Floor = 3 },
+              new Microchip { Element = Element.Elerium, Floor = 1 },
+              new Microchip { Element = Element.Dilithium, Floor = 1 }
             },
             LiftLocation = 1
           };
