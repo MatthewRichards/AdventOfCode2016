@@ -11,7 +11,7 @@ namespace AdventOfCode2016
 {
   internal class Day11
   {
-    private static void Main()
+    private static void Main11()
     {
       var searchList = new Queue<Tuple<ContainmentArea, int>>();
       var seenPositions = new HashSet<string>();
