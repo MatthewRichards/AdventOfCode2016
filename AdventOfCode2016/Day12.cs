@@ -15,7 +15,7 @@ namespace AdventOfCode2016
     {
       var program = Input.SplitLines().Select(line => line.Split(' ')).ToArray();
 
-      Dictionary<char, int> registers = new Dictionary<char, int> {{'a', 0}, {'b', 0}, {'c', 0}, {'d', 0}};
+      Dictionary<char, int> registers = new Dictionary<char, int> {{'a', 0}, {'b', 0}, {'c', 1}, {'d', 0}};
       int instr = 0;
 
       while (instr < program.Length)
