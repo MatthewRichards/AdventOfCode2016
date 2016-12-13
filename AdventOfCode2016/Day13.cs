@@ -16,9 +16,10 @@ namespace AdventOfCode2016
       int pathLength = 0;
       var cubiclesAtThisDistance = new List<Tuple<int, int>> {Tuple.Create(1, 1)};
       var cubiclesVisited = new HashSet<Tuple<int, int>> {Tuple.Create(1, 1)};
-      var targetCubicle = Tuple.Create(31, 39);
+      //var targetCubicle = Tuple.Create(31, 39);
+      var targetDistance = 50;
 
-      while (!cubiclesVisited.Contains(targetCubicle))
+      while (pathLength < targetDistance)
       {
         pathLength++;
         var cubiclesAtNextDistance = new List<Tuple<int, int>>();
@@ -35,7 +36,7 @@ namespace AdventOfCode2016
         cubiclesAtThisDistance = cubiclesAtNextDistance;
       }
 
-      Console.WriteLine(pathLength);
+      Console.WriteLine(cubiclesVisited.Count);
       Console.ReadKey();
     }
 
