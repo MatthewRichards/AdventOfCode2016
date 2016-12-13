@@ -11,7 +11,7 @@ namespace AdventOfCode2016
 {
   internal class Day12
   {
-    private static void Main()
+    private static void Main12()
     {
       var program = Input.SplitLines().Select(line => line.Split(' ')).ToArray();
 
