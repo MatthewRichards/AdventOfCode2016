@@ -42,11 +42,18 @@ namespace AdventOfCode2016
     private static string GetCandidateKey(int index)
     {
       const string salt = "jlmsuwbz";
+      //const string salt = "abc";
+      var hash = salt + index;
 
-      return string.Join("", new MD5CryptoServiceProvider()
-        .ComputeHash(Encoding.ASCII.GetBytes(salt + index))
-        .SelectMany(b => new[] { b >> 4, b & 0xF })
-        .Select(n => "0123456789abcdef"[n]));
+      for (int i = 0; i < 2017; i++)
+      {
+        hash = string.Join("", new MD5CryptoServiceProvider()
+          .ComputeHash(Encoding.ASCII.GetBytes(hash))
+          .SelectMany(b => new[] {b >> 4, b & 0xF})
+          .Select(n => "0123456789abcdef"[n]));
+      }
+
+      return hash;
     }
 
     private static bool IsValidKey(string key, Queue<string> nextThousandKeys)
