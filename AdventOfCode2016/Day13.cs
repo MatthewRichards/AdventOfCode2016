@@ -11,7 +11,7 @@ namespace AdventOfCode2016
 {
   internal class Day13
   {
-    private static void Main()
+    private static void Main13()
     {
       int pathLength = 0;
       var cubiclesAtThisDistance = new List<Tuple<int, int>> {Tuple.Create(1, 1)};

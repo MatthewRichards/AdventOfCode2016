@@ -7,7 +7,7 @@ namespace AdventOfCode2016
 {
   internal class FasterDay11
   {
-    private static void Main()
+    private static void Main11()
     {
       var timer = new Stopwatch();
       timer.Start();
