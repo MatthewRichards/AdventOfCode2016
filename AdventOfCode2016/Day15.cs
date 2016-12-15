@@ -13,8 +13,8 @@ namespace AdventOfCode2016
   {
     private static void Main()
     {
-      var initialPositions = new[] {5, 8, 1, 7, 1, 0};
-      var limitPositions = new[] {17, 19, 7, 13, 5, 3};
+      var initialPositions = new[] {5, 8, 1, 7, 1, 0, 0};
+      var limitPositions = new[] {17, 19, 7, 13, 5, 3, 11};
 
       var state = initialPositions.Zip(limitPositions, Tuple.Create).Select((tup, idx) => Tuple.Create((tup.Item1 + idx + 1) % tup.Item2, tup.Item2)).ToList();
 
