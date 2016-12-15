@@ -11,7 +11,7 @@ namespace AdventOfCode2016
 {
   internal class Day14
   {
-    private static void Main()
+    private static void Main14()
     {
       int index = 0;
       var buffer = new Queue<string>();
