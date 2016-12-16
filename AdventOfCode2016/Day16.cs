@@ -14,7 +14,7 @@ namespace AdventOfCode2016
     private static void Main()
     {
       const string input = "11101000110010100";
-      const int diskLength = 272;
+      const int diskLength = 35651584;
 
       bool[] initialBits = input.Select(d => d == '1').ToArray();
       bool[] disk = new bool[diskLength];
