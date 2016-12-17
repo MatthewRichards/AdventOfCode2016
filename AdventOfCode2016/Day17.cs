@@ -13,26 +13,127 @@ namespace AdventOfCode2016
   {
     private static MD5CryptoServiceProvider hasher = new MD5CryptoServiceProvider();
 
+    [Flags]
+    private enum Directions
+    {
+      Up = 0x1,
+      Down = 0x2,
+      Left = 0x4,
+      Right = 0x8,
+      Calculated = 0x10
+    }
+
     private static void Main()
     {
       const string passcode = @"ioramepc";
       byte[] initialRoute = Encoding.ASCII.GetBytes(passcode);
-      var states = new Queue<State>(new[] { new State { Route = initialRoute, Distance = 0, X = 0, Y = 0 } });
 
-      while (true)
+      byte[] path = new byte[initialRoute.Length + 1000];
+      Array.Copy(initialRoute, path, initialRoute.Length);
+      int pathIndex = initialRoute.Length;
+
+      Directions[] validDirections = new Directions[path.Length];
+      int[] xPositions = new int[path.Length];
+      int[] yPositions = new int[path.Length];
+
+      xPositions[pathIndex] = 0;
+      yPositions[pathIndex] = 0;
+
+      int longestRoute = int.MinValue;
+
+      while (pathIndex >= initialRoute.Length)
       {
-        var currentState = states.Dequeue();
-        foreach (var nextState in GetNextStates(currentState))
+        if (xPositions[pathIndex] == 3 && yPositions[pathIndex] == 3)
         {
-          if (nextState.X == 3 && nextState.Y == 3)
+          // Solution!
+          if (pathIndex > longestRoute)
           {
-            Console.WriteLine(Encoding.ASCII.GetString(nextState.Route));
-            Console.ReadKey();
+            longestRoute = pathIndex;
+            Console.WriteLine($"Found route of length {longestRoute - initialRoute.Length}");
           }
 
-          states.Enqueue(nextState);
+          // Can't go any further; go back and try another direction
+          validDirections[pathIndex] = 0;
+          pathIndex--;
+          continue;
         }
+
+        if (validDirections[pathIndex] == 0)
+        {
+          // Calculate where we can go from this position
+          var hash = hasher.ComputeHash(path, 0, pathIndex);
+
+          if (yPositions[pathIndex] > 0 && hash[0] >= 0xB0)
+          {
+            validDirections[pathIndex] |= Directions.Up;
+          }
+
+          if (yPositions[pathIndex] < 3 && (hash[0] & 0xF) >= 0xB)
+          {
+            validDirections[pathIndex] |= Directions.Down;
+          }
+
+          if (xPositions[pathIndex] > 0 && hash[1] >= 0xB0)
+          {
+            validDirections[pathIndex] |= Directions.Left;
+          }
+
+          if (xPositions[pathIndex] < 3 && (hash[1] & 0xF) >= 0xB)
+          {
+            validDirections[pathIndex] |= Directions.Right;
+          }
+
+          validDirections[pathIndex] |= Directions.Calculated;
+        }
+
+        // Try going in the first available direction
+        if ((validDirections[pathIndex] & Directions.Up) != 0)
+        {
+          validDirections[pathIndex] = validDirections[pathIndex] ^ Directions.Up; // "Use up" this option so we don't try it again in future
+          path[pathIndex] = (byte)'U';
+          pathIndex++;
+          xPositions[pathIndex] = xPositions[pathIndex - 1];
+          yPositions[pathIndex] = yPositions[pathIndex - 1] - 1;
+          continue;
+        }
+
+        if ((validDirections[pathIndex] & Directions.Down) != 0)
+        {
+          validDirections[pathIndex] = validDirections[pathIndex] ^ Directions.Down;
+          path[pathIndex] = (byte)'D';
+          pathIndex++;
+          xPositions[pathIndex] = xPositions[pathIndex - 1];
+          yPositions[pathIndex] = yPositions[pathIndex - 1] + 1;
+          continue;
+        }
+
+        if ((validDirections[pathIndex] & Directions.Left) != 0)
+        {
+          validDirections[pathIndex] = validDirections[pathIndex] ^ Directions.Left;
+          path[pathIndex] = (byte)'L';
+          pathIndex++;
+          xPositions[pathIndex] = xPositions[pathIndex - 1] - 1;
+          yPositions[pathIndex] = yPositions[pathIndex - 1];
+          continue;
+        }
+
+        if ((validDirections[pathIndex] & Directions.Right) != 0)
+        {
+          validDirections[pathIndex] = validDirections[pathIndex] ^ Directions.Right;
+          path[pathIndex] = (byte)'R';
+          pathIndex++;
+          xPositions[pathIndex] = xPositions[pathIndex - 1] + 1;
+          yPositions[pathIndex] = yPositions[pathIndex - 1];
+          continue;
+        }
+
+        // We have nowhere to go - we're stuck! Go back and try another path
+        validDirections[pathIndex] = 0;
+        pathIndex--;
       }
+
+      Console.WriteLine(longestRoute - initialRoute.Length);
+      Console.ReadKey();
     }
 
     private static IEnumerable<State> GetNextStates(State currentState)
