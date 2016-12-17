@@ -146,48 +146,5 @@ namespace AdventOfCode2016
       Console.WriteLine($"Total time: {timer.ElapsedMilliseconds}ms");
       Console.ReadKey();
     }
-
-    private static IEnumerable<State> GetNextStates(State currentState)
-    {
-      var hash = hasher.ComputeHash(currentState.Route);
-
-      if (currentState.Y > 0 && hash[0] >= 0xB0)
-      {
-        yield return currentState.Move('U', 0, -1);
-      }
-
-      if (currentState.Y < 4 && (hash[0] & 0xF) >= 0xB)
-      {
-        yield return currentState.Move('D', 0, 1);
-      }
-
-      if (currentState.X > 0 && hash[1] >= 0xB0)
-      {
-        yield return currentState.Move('L', -1, 0);
-      }
-
-      if (currentState.X < 4 && (hash[1] & 0xF) >= 0xB)
-      {
-        yield return currentState.Move('R', 1, 0);
-      }
-    }
-
-    private class State
-    {
-      public byte[] Route;
-      public int Distance;
-      public int X;
-      public int Y;
-
-      public State Move(char step, int dX, int dY)
-      {
-        var newRoute = new byte[Route.Length + 1];
-        Array.Copy(Route, newRoute, Route.Length);
-        newRoute[Route.Length] = (byte)step;
-
-        return new State { Route = newRoute, Distance = Distance + 1, X = X + dX, Y = Y + dY };
-      }
-    }
-    
   }
 }
