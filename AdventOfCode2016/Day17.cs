@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace AdventOfCode2016
 {
@@ -25,6 +22,9 @@ namespace AdventOfCode2016
 
     private static void Main()
     {
+      var timer = new Stopwatch();
+      timer.Start();
+
       const string passcode = @"ioramepc";
       byte[] initialRoute = Encoding.ASCII.GetBytes(passcode);
 
@@ -40,6 +40,8 @@ namespace AdventOfCode2016
       yPositions[pathIndex] = 0;
 
       int longestRoute = int.MinValue;
+      int shortestRoute = int.MaxValue;
+      string shortestRouteDetail = "";
 
       while (pathIndex >= initialRoute.Length)
       {
@@ -49,7 +51,12 @@ namespace AdventOfCode2016
           if (pathIndex > longestRoute)
           {
             longestRoute = pathIndex;
-            Console.WriteLine($"Found route of length {longestRoute - initialRoute.Length}");
+          }
+
+          if (pathIndex < shortestRoute)
+          {
+            shortestRoute = pathIndex;
+            shortestRouteDetail = Encoding.ASCII.GetString(path, initialRoute.Length, pathIndex - initialRoute.Length);
           }
 
           // Can't go any further; go back and try another direction
@@ -132,7 +139,11 @@ namespace AdventOfCode2016
         pathIndex--;
       }
 
-      Console.WriteLine(longestRoute - initialRoute.Length);
+      timer.Stop();
+
+      Console.WriteLine($"Shortest route: {shortestRoute - initialRoute.Length} ({shortestRouteDetail})");
+      Console.WriteLine($"Longest route: {longestRoute - initialRoute.Length}");
+      Console.WriteLine($"Total time: {timer.ElapsedMilliseconds}ms");
       Console.ReadKey();
     }
 
