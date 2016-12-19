@@ -9,7 +9,7 @@ namespace AdventOfCode2016
 {
   internal class Day18
   {
-    private static void Main()
+    private static void Main18()
     {
       var timer = new Stopwatch();
       timer.Start();
