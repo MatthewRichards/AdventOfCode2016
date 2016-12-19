@@ -15,36 +15,33 @@ namespace AdventOfCode2016
       timer.Start();
 
       int elfCount = 3017957;
-      bool[] elves = new bool[elfCount];
-      int elfIndex = 0;
-      int lastPresentReceiver;
 
-      while (true)
+      LinkedList<int> elves = new LinkedList<int>(Enumerable.Range(1, elfCount));
+      var currentElf = elves.First;
+      var targetElf = currentElf;
+      var targetElfDistance = 0;
+      var remainingElves = elfCount;
+
+      while (remainingElves > 1)
       {
-        lastPresentReceiver = elfIndex;
-        elfIndex = (elfIndex + 1) % elfCount;
-
-        while (elves[elfIndex])
+        int acrossTheCircle = remainingElves/2;
+        
+        for (int i = targetElfDistance; i < acrossTheCircle; i++)
         {
-          elfIndex = (elfIndex + 1) % elfCount;
+          targetElf = targetElf.Next ?? elves.First;
         }
 
-        if (elfIndex == lastPresentReceiver)
-        {
-          // This is the last elf!
-          Console.WriteLine($"Last elf: {elfIndex + 1}");
-          break;
-        }
+        var nextTargetElf = targetElf.Next ?? elves.First;
+        targetElf.List.Remove(targetElf);
+        remainingElves--;
 
-        elves[elfIndex] = true;
-
-        do
-        {
-          elfIndex = (elfIndex + 1) % elfCount;
-        } while (elves[elfIndex]);
+        targetElf = nextTargetElf;
+        currentElf = currentElf.Next ?? elves.First;
+        targetElfDistance = acrossTheCircle - 1;
       }
 
       timer.Stop();
+      Console.WriteLine($"Final elf: {currentElf.Value}");
       Console.WriteLine($"Total time: {timer.ElapsedMilliseconds}ms");
       Console.ReadKey();
     }
