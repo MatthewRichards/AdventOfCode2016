@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace AdventOfCode2016
 {
@@ -13,20 +11,60 @@ namespace AdventOfCode2016
     {
       var timer = new Stopwatch();
       timer.Start();
-      long minValue = -1;
-      long newMinValue = 0;
 
-      while (newMinValue != minValue)
+      var validRanges = new LinkedList<Tuple<uint, uint>>(new[] {Tuple.Create((uint)0, uint.MaxValue)});
+
+      foreach (var restriction in Input.SplitLines().Select(l => l.Split('-').Select(uint.Parse).ToArray()))
       {
-        minValue = newMinValue;
+        var lbound = restriction[0];
+        var ubound = restriction[1];
 
-        newMinValue = Input.SplitLines()
-        .Select(l => l.Split('-').Select(long.Parse).ToArray())
-        .Aggregate(minValue, (acc, pair) => acc < pair[0] ? acc : Math.Max(acc, pair[1] + 1));
+        var range = validRanges.First;
+
+        do
+        {
+          if (lbound <= range.Value.Item1 && ubound < range.Value.Item2 && ubound >= range.Value.Item1)
+          {
+            var newRange = validRanges.AddAfter(range, Tuple.Create(ubound + 1, range.Value.Item2));
+            validRanges.Remove(range);
+            range = newRange;
+          }
+          else if (lbound <= range.Value.Item1 && ubound >= range.Value.Item2)
+          {
+            var newRange = range.Next;
+            validRanges.Remove(range);
+            range = newRange;
+          }
+          else if (lbound > range.Value.Item1 && ubound < range.Value.Item2)
+          {
+            validRanges.AddBefore(range, Tuple.Create(range.Value.Item1, lbound - 1));
+            var secondRange = validRanges.AddAfter(range, Tuple.Create(ubound + 1, range.Value.Item2));
+            validRanges.Remove(range);
+            range = secondRange;
+          }
+          else if (lbound <= range.Value.Item2 && ubound >= range.Value.Item2 && lbound > range.Value.Item1)
+          {
+            var newRange = validRanges.AddBefore(range, Tuple.Create(range.Value.Item1, lbound - 1));
+            validRanges.Remove(range);
+            range = newRange.Next;
+          }
+          else if (range.Value.Item2 < ubound)
+          {
+            range = range.Next;
+          }
+          else
+          {
+            break;
+          }
+        } while (range != null);
       }
+
+      var minValue = validRanges.First.Value.Item1;
+      var totalIPs = validRanges.Sum(pair => pair.Item2 - pair.Item1 + 1);
 
       Console.WriteLine($"Minimum value: {minValue}");
       Console.WriteLine($"IP: {minValue >> 24}.{(minValue >> 16) & 0xFF}.{(minValue >> 8) & 0xFF}.{minValue & 0xFF}");
+      Console.WriteLine($"Total IPs: {totalIPs}");
       Console.WriteLine($"Total time: {timer.ElapsedMilliseconds}ms");
       Console.ReadKey();
     }
