@@ -19,16 +19,15 @@ namespace AdventOfCode2016
       var matcher = new Regex(regex);
 
       Func<IEnumerable<string>, Tuple<string, Func<Match, string, string>>[], IEnumerable<Func<string, string>>> transformGenerator =
-        (commands, transforms) => commands.Select(line => Tuple.Create(line, matcher.Match(line)))
+        (commands, transforms) => commands.Select(line => matcher.Match(line))
           .Select(
-            tuple =>
-              Tuple.Create(tuple.Item1, tuple.Item2,
+            match =>
+              (Func<string, string>)(input =>
                 transforms[
                   int.Parse(
                     matcher.GetGroupNames()
-                      .Single(group => group.StartsWith("transform") && tuple.Item2.Groups[group].Success)
-                      .Substring("transform".Length))]))
-          .Select(tuple => (Func<string, string>) (input => tuple.Item3.Item2(tuple.Item2, input)));
+                      .Single(group => group.StartsWith("transform") && match.Groups[group].Success)
+                      .Substring("transform".Length))].Item2(match, input)));
 
       var encodedPassword = transformGenerator(Input.SplitLines(), Transforms).Aggregate(PasswordToEncrypt, (acc, func) => func(acc));
 
@@ -50,49 +49,49 @@ namespace AdventOfCode2016
     private static readonly Tuple<string, Func<Match, string, string>>[] Transforms = {
       CommandWithPositionArgs(
         @"swap position (?<position1>\d+) with position (?<position2>\d+)",
-        (pos1, pos2, input) => Swap(input, pos1, pos2)),
+        Swap),
       CommandWithLetterArgs(
         @"swap letter (?<letter1>\w+) with letter (?<letter2>\w+)",
-        (pos1, pos2, input) => Swap(input, input.IndexOf(pos1), input.IndexOf(pos2))),
+        (pos1, pos2, input) => Swap(input.IndexOf(pos1), input.IndexOf(pos2), input)),
       CommandWithIntArg(
         @"rotate left (?<int>\d+) steps?",
-        (steps, input) => RotateLeft(input, steps)),
+        RotateLeft),
       CommandWithIntArg(
         @"rotate right (?<int>\d+) steps?",
-        (steps, input) => RotateRight(input, steps)),
+        RotateRight),
       CommandWithLetterArg(
         @"rotate based on position of letter (?<letter>\w+)",
-        (letter, input) => RotateRight(input, input.IndexOf(letter) + (input.IndexOf(letter) >= 4 ? 2 : 1))),
+        (letter, input) => RotateRight(input.IndexOf(letter) + (input.IndexOf(letter) >= 4 ? 2 : 1), input)),
       CommandWithPositionArgs(
         @"reverse positions (?<position1>\d+) through (?<position2>\d+)",
-        (pos1, pos2, input) => ReverseRange(input, pos1, pos2)),
+        ReverseRange),
       CommandWithPositionArgs(
         @"move position (?<position1>\d+) to position (?<position2>\d+)",
-        (pos1, pos2, input) => Move(input, pos1, pos2))
+        Move)
     };
 
     private static readonly Tuple<string, Func<Match, string, string>>[] InverseTransforms = {
       CommandWithPositionArgs(
         @"swap position (?<position1>\d+) with position (?<position2>\d+)",
-        (pos1, pos2, input) => Swap(input, pos1, pos2)),
+        Swap),
       CommandWithLetterArgs(
         @"swap letter (?<letter1>\w+) with letter (?<letter2>\w+)",
-        (pos1, pos2, input) => Swap(input, input.IndexOf(pos1), input.IndexOf(pos2))),
+        (pos1, pos2, input) => Swap(input.IndexOf(pos1), input.IndexOf(pos2), input)),
       CommandWithIntArg(
         @"rotate left (?<int>\d+) steps?",
-        (steps, input) => RotateRight(input, steps)),
+        RotateRight),
       CommandWithIntArg(
         @"rotate right (?<int>\d+) steps?",
-        (steps, input) => RotateLeft(input, steps)),
+        RotateLeft),
       CommandWithLetterArg(
         @"rotate based on position of letter (?<letter>\w+)",
-        (letter, input) => RotateLeft(input, CalculateReverseRotationBasedOnPosition(input, letter))),
+        (letter, input) => RotateLeft(CalculateReverseRotationBasedOnPosition(input, letter), input)),
       CommandWithPositionArgs(
         @"reverse positions (?<position1>\d+) through (?<position2>\d+)",
-        (pos1, pos2, input) => ReverseRange(input, pos1, pos2)),
+        ReverseRange),
       CommandWithPositionArgs(
         @"move position (?<position1>\d+) to position (?<position2>\d+)",
-        (pos1, pos2, input) => Move(input, pos2, pos1))
+        (pos1, pos2, input) => Move(pos2, pos1, input))
     };
 
     private static int CalculateReverseRotationBasedOnPosition(string input, char letter)
@@ -143,7 +142,7 @@ namespace AdventOfCode2016
          func(match.Groups["letter"].Value.Single(), input)));
     }
 
-    private static string Swap(string input, int x, int y)
+    private static string Swap(int x, int y, string input)
     {
       var first = Math.Min(x, y);
       var second = Math.Max(x, y);
@@ -155,26 +154,26 @@ namespace AdventOfCode2016
              (second == input.Length - 1 ? "" : input.Substring(second + 1));
     }
 
-    private static string Move(string input, int x, int y)
+    private static string Move(int x, int y, string input)
     {
       var character = input[x];
       var working = input.Remove(x, 1);
       return (y == 0 ? "" : working.Substring(0, y)) + character + working.Substring(y);
     }
 
-    private static string RotateLeft(string input, int steps)
+    private static string RotateLeft(int steps, string input)
     {
       steps = steps % input.Length;
       return input.Substring(steps) + input.Substring(0, steps);
     }
 
-    private static string RotateRight(string input, int steps)
+    private static string RotateRight(int steps, string input)
     {
       steps = steps%input.Length;
       return input.Substring(input.Length - steps) + input.Substring(0, input.Length - steps);
     }
 
-    private static string ReverseRange(string input, int from, int to)
+    private static string ReverseRange(int @from, int to, string input)
     {
       return (from == 0 ? "" : input.Substring(0, from)) +
              string.Join("", input.Substring(from, to - from + 1).Reverse()) +
