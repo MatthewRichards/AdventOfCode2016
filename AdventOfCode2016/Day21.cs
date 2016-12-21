@@ -18,25 +18,36 @@ namespace AdventOfCode2016
       var regex = string.Join("|", Transforms.Select((transform, index) => $"(?<transform{index}>({transform.Item1}))"));
       var matcher = new Regex(regex);
 
-      var completeTransform = Input.SplitLines().Select(line => Tuple.Create(line, matcher.Match(line)))
-        .Select(
-          tuple =>
-            Tuple.Create(tuple.Item1, tuple.Item2,
-              Transforms[
-                int.Parse(
-                  matcher.GetGroupNames()
-                    .Single(group => group.StartsWith("transform") && tuple.Item2.Groups[group].Success)
-                    .Substring("transform".Length))]))
-        .Select(tuple => (Func<string, string>) (input => tuple.Item3.Item2(tuple.Item2, input)));
+      Func<IEnumerable<string>, Tuple<string, Func<Match, string, string>>[], IEnumerable<Func<string, string>>> transformGenerator =
+        (commands, transforms) => commands.Select(line => Tuple.Create(line, matcher.Match(line)))
+          .Select(
+            tuple =>
+              Tuple.Create(tuple.Item1, tuple.Item2,
+                transforms[
+                  int.Parse(
+                    matcher.GetGroupNames()
+                      .Single(group => group.StartsWith("transform") && tuple.Item2.Groups[group].Success)
+                      .Substring("transform".Length))]))
+          .Select(tuple => (Func<string, string>) (input => tuple.Item3.Item2(tuple.Item2, input)));
 
-      var encodedPassword = completeTransform.Aggregate(Password, (acc, func) => func(acc));
+      var encodedPassword = transformGenerator(Input.SplitLines(), Transforms).Aggregate(PasswordToEncrypt, (acc, func) => func(acc));
+
+      var reverseTransforms = transformGenerator(Input.SplitLines().Reverse(), InverseTransforms).ToList();
+      var decryptedPassword = reverseTransforms.Aggregate(PasswordToDecrypt, (acc, func) => func(acc));
+      var senseCheck = reverseTransforms.Aggregate(encodedPassword, (acc, func) => func(acc));
+
+      if (senseCheck != PasswordToEncrypt)
+      {
+        Console.WriteLine($"Oops, decoded original password as {senseCheck}");
+      }
 
       Console.WriteLine($"Encoded password: {encodedPassword}");
+      Console.WriteLine($"Decrypted password: {decryptedPassword}");
       Console.WriteLine($"Total time: {timer.ElapsedMilliseconds}ms");
       Console.ReadKey();
     }
 
-    private static readonly Tuple<string, Func<Match, string, string>>[] Transforms = { 
+    private static readonly Tuple<string, Func<Match, string, string>>[] Transforms = {
       CommandWithPositionArgs(
         @"swap position (?<position1>\d+) with position (?<position2>\d+)",
         (pos1, pos2, input) => Swap(input, pos1, pos2)),
@@ -59,6 +70,46 @@ namespace AdventOfCode2016
         @"move position (?<position1>\d+) to position (?<position2>\d+)",
         (pos1, pos2, input) => Move(input, pos1, pos2))
     };
+
+    private static readonly Tuple<string, Func<Match, string, string>>[] InverseTransforms = {
+      CommandWithPositionArgs(
+        @"swap position (?<position1>\d+) with position (?<position2>\d+)",
+        (pos1, pos2, input) => Swap(input, pos1, pos2)),
+      CommandWithLetterArgs(
+        @"swap letter (?<letter1>\w+) with letter (?<letter2>\w+)",
+        (pos1, pos2, input) => Swap(input, input.IndexOf(pos1), input.IndexOf(pos2))),
+      CommandWithIntArg(
+        @"rotate left (?<int>\d+) steps?",
+        (steps, input) => RotateRight(input, steps)),
+      CommandWithIntArg(
+        @"rotate right (?<int>\d+) steps?",
+        (steps, input) => RotateLeft(input, steps)),
+      CommandWithLetterArg(
+        @"rotate based on position of letter (?<letter>\w+)",
+        (letter, input) => RotateLeft(input, CalculateReverseRotationBasedOnPosition(input, letter))),
+      CommandWithPositionArgs(
+        @"reverse positions (?<position1>\d+) through (?<position2>\d+)",
+        (pos1, pos2, input) => ReverseRange(input, pos1, pos2)),
+      CommandWithPositionArgs(
+        @"move position (?<position1>\d+) to position (?<position2>\d+)",
+        (pos1, pos2, input) => Move(input, pos2, pos1))
+    };
+
+    private static int CalculateReverseRotationBasedOnPosition(string input, char letter)
+    {
+      // Non-reversed version: input.IndexOf(letter) + (input.IndexOf(letter) >= 4 ? 2 : 1
+      // There's a sum that would just work this out, but it requires less brainpower to just imagine slowly reversing until we get to a plausible answer
+      var currentPosition = input.IndexOf(letter);
+      int amountToReverse = 0;
+
+      while (currentPosition + (currentPosition >= 4 ? 2 : 1) != amountToReverse)
+      {
+        amountToReverse++;
+        currentPosition = (currentPosition + input.Length - 1) % input.Length;
+      }
+
+      return amountToReverse;
+    }
 
     private static Tuple<string, Func<Match, string, string>> CommandWithPositionArgs(
       string regex,
@@ -130,7 +181,8 @@ namespace AdventOfCode2016
              (to == input.Length - 1 ? "" : input.Substring(to + 1));
     }
 
-    private const string Password = "abcdefgh";
+    private const string PasswordToEncrypt = "abcdefgh";
+    private const string PasswordToDecrypt = "fbgdceah";
 
     private const string Input = @"move position 0 to position 3
 rotate right 0 steps
