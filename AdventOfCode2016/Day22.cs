@@ -15,64 +15,67 @@ namespace AdventOfCode2016
       var timer = new Stopwatch();
       timer.Start();
 
-      var servers = DfOutput.Parse(Input).ToList();
+      var servers = DfOutput.Parse(Input);
+      var grid = CreateGrid(servers);
+      var target = Tuple.Create(0, grid[0].Length - 1);
+      
+      PrintGrid(grid, target);
 
       int viablePairs = servers
         .Where(s => s.UsedTB > 0)
         .Sum(a => servers.Count(b => b != a && b.AvailTB >= a.UsedTB));
-      
+
+      int viableAdjacentPairs = servers
+        .Where(s => s.UsedTB > 0)
+        .Sum(a => a.GetViableNeighbours(grid).Count(b => b.AvailTB >= a.UsedTB));
+
+      Console.WriteLine($"Total servers: {servers.Count()}");
       Console.WriteLine($"Pairs of servers: {viablePairs}");
+      Console.WriteLine($"Neighbouring pairs: {viableAdjacentPairs}");
+
       Console.WriteLine($"Total time: {timer.ElapsedMilliseconds}ms");
       Console.ReadKey();
     }
 
+    private static void PrintGrid(DfOutput[][] grid, Tuple<int, int> target)
+    {
+      for (int y = 0; y < grid.Length; y++)
+      {
+        for (int x = 0; x < grid[y].Length; x++)
+        {
+          if (target.Item1 == y && target.Item2 == x)
+          {
+            Console.Write("G   ");
+          }
+          else if (grid[y][x].UsedTB == 0)
+          {
+            Console.Write("*   ");
+          }
+          else
+          {
+            Console.Write(grid[y][x].SizeTB.ToString("000") + " ");
+          }
+        }
+
+        Console.WriteLine();
+      }
+    }
+
+    private static DfOutput[][] CreateGrid(IEnumerable<DfOutput> servers)
+    {
+      return Enumerable.Range(0, servers.Max(s => s.Y) + 1)
+        .Select(y => Enumerable.Range(0, servers.Max(s => s.X) + 1)
+          .Select(x => servers.Single(s => s.X == x && s.Y == y)).ToArray()).ToArray();
+    }
+    
     private class DfOutput
     {
       public string Filesystem;
       public int X;
       public int Y;
-      public string Size;
-      public string Used;
-      public string Avail;
-
-      public int SizeTB
-      {
-        get
-        {
-          if (Size.Substring(Size.Length - 1) != "T")
-          {
-            throw new Exception("Size was not in TB!");
-          }
-
-          return int.Parse(Size.Substring(0, Size.Length - 1));
-        }
-      }
-
-      public int UsedTB
-      {
-        get
-        {
-          if (Used.Substring(Used.Length - 1) != "T")
-          {
-            throw new Exception("Used was not in TB!");
-          }
-
-          return int.Parse(Used.Substring(0, Used.Length - 1));
-        }
-      }
-
-      public int AvailTB
-      {
-        get
-        {
-          if (Avail.Substring(Avail.Length - 1) != "T")
-          {
-            throw new Exception("Avail was not in TB!");
-          }
-
-          return int.Parse(Avail.Substring(0, Avail.Length - 1));
-        }
-      }
+      public int SizeTB;
+      public int UsedTB;
+      public int AvailTB;
 
       public static IEnumerable<DfOutput> Parse(string input)
       {
@@ -83,15 +86,35 @@ namespace AdventOfCode2016
             Filesystem = match.Groups["filesystem"].Value,
             X = int.Parse(match.Groups["x"].Value),
             Y = int.Parse(match.Groups["y"].Value),
-            Size = match.Groups["size"].Value,
-            Used = match.Groups["used"].Value,
-            Avail = match.Groups["avail"].Value
+            SizeTB = int.Parse(match.Groups["size"].Value),
+            UsedTB = int.Parse(match.Groups["used"].Value),
+            AvailTB = int.Parse(match.Groups["avail"].Value)
           };
         }
       }
 
       private static Regex regex = new Regex(
-        @"(?<filesystem>/dev/grid/node-x(?<x>\d+)-y(?<y>\d+))\s+(?<size>\d+\w)\s+(?<used>\d+\w)\s+(?<avail>\d+\w)");
+        @"(?<filesystem>/dev/grid/node-x(?<x>\d+)-y(?<y>\d+))\s+(?<size>\d+)T\s+(?<used>\d+)T\s+(?<avail>\d+)T");
+
+      public IEnumerable<DfOutput> GetViableNeighbours(DfOutput[][] grid)
+      {
+        if (X > 0 && grid[Y][X - 1]?.AvailTB >= UsedTB)
+        {
+          yield return grid[Y][X - 1];
+        }
+        if (X < grid[0].Length - 1 && grid[Y][X + 1]?.AvailTB >= UsedTB)
+        {
+          yield return grid[Y][X + 1];
+        }
+        if (Y > 0 && grid[Y - 1][X]?.AvailTB >= UsedTB)
+        {
+          yield return grid[Y - 1][X];
+        }
+        if (Y < grid.Length - 1 && grid[Y + 1][X]?.AvailTB >= UsedTB)
+        {
+          yield return grid[Y + 1][X];
+        }
+      }
 
     }
 
