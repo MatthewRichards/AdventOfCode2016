@@ -16,22 +16,10 @@ namespace AdventOfCode2016
       timer.Start();
 
       var servers = DfOutput.Parse(Input).ToList();
-      int viablePairs = 0;
 
-      for (int a = 0; a < servers.Count; a++)
-      {
-        if (servers[a].UsedTB == 0) continue;
-        
-        for (int b = 0; b < servers.Count; b++)
-        {
-          if (a == b) continue;
-
-          if (servers[b].AvailTB >= servers[a].UsedTB)
-          {
-            viablePairs++;
-          }
-        }
-      }
+      int viablePairs = servers
+        .Where(s => s.UsedTB > 0)
+        .Sum(a => servers.Count(b => b != a && b.AvailTB >= a.UsedTB));
       
       Console.WriteLine($"Pairs of servers: {viablePairs}");
       Console.WriteLine($"Total time: {timer.ElapsedMilliseconds}ms");
