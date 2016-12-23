@@ -7,11 +7,11 @@ namespace AdventOfCode2016
   {
     public static void Run()
     {
-      Dictionary<char, int> testRegisters = new Dictionary<char, int> { { 'a', 0 }, { 'b', 0 }, { 'c', 0 }, { 'd', 0 } };
+      var testRegisters = new Dictionary<char, long> { { 'a', 0 }, { 'b', 0 }, { 'c', 0 }, { 'd', 0 } };
       new AssembunnyInterpreter().Execute(TestInput, testRegisters);
       Console.WriteLine($"Test output: {testRegisters['a']}");
 
-      Dictionary<char, int> registers = new Dictionary<char, int> { { 'a', 7 }, { 'b', 0 }, { 'c', 0 }, { 'd', 0 } };
+      var registers = new Dictionary<char, long> { { 'a', 12 }, { 'b', 0 }, { 'c', 0 }, { 'd', 0 } };
       new AssembunnyInterpreter().Execute(Input, registers);
       Console.WriteLine($"Real output: {registers['a']}");
     }
@@ -24,8 +24,8 @@ cpy 1 a
 dec a
 dec a";
 
-    private const string Input = @"cpy a b
-dec b
+    /* 
+Replaced:
 cpy a d
 cpy 0 a
 cpy b c
@@ -34,6 +34,27 @@ dec c
 jnz c -2
 dec d
 jnz d -5
+
+With:
+mul a b
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+     */
+    private const string Input = @"cpy a b
+dec b
+mul a b
+nop
+nop
+nop
+nop
+nop
+nop
+nop
 dec b
 cpy b c
 cpy c d
@@ -51,5 +72,5 @@ jnz d -2
 inc c
 jnz c -5";
 
-  }
+ }
 }

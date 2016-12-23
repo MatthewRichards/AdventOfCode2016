@@ -5,7 +5,7 @@ namespace AdventOfCode2016
 {
   class AssembunnyInterpreter
   {
-    public void Execute(string input, Dictionary<char, int> registers)
+    public void Execute(string input, Dictionary<char, long> registers)
     {
       var program = input.SplitLines().Select(line => line.Split(' ')).ToArray();
       int instr = 0;
@@ -16,10 +16,13 @@ namespace AdventOfCode2016
 
         switch (program[instr][0])
         {
+          case "nop":
+            break;
+
           case "cpy":
             var source = program[instr][1];
-            int sourceValue;
-            if (!int.TryParse(source, out sourceValue))
+            long sourceValue;
+            if (!long.TryParse(source, out sourceValue))
             {
               sourceValue = registers[source.Single()];
             }
@@ -41,10 +44,22 @@ namespace AdventOfCode2016
             registers[registerToDec] = registers[registerToDec] - 1;
             break;
 
+          case "mul":
+            var registerToMultiply = program[instr][1].Single();
+
+            long multiplyBy;
+            if (!long.TryParse(program[instr][2], out multiplyBy))
+            {
+              multiplyBy = registers[program[instr][2].Single()];
+            }
+
+            registers[registerToMultiply] *= multiplyBy;
+            break;
+
           case "jnz":
             var variableToTest = program[instr][1];
-            int valueToTest;
-            if (!int.TryParse(variableToTest, out valueToTest))
+            long valueToTest;
+            if (!long.TryParse(variableToTest, out valueToTest))
             {
               valueToTest = registers[variableToTest.Single()];
             }
@@ -54,7 +69,7 @@ namespace AdventOfCode2016
               int jump;
               if (!int.TryParse(program[instr][2], out jump))
               {
-                jump = registers[program[instr][2].Single()];
+                jump = (int)registers[program[instr][2].Single()];
               }
               nextInstr = instr + jump;
             }
@@ -64,7 +79,7 @@ namespace AdventOfCode2016
             int instrToToggle;
             if (!int.TryParse(program[instr][1], out instrToToggle))
             {
-              instrToToggle = registers[program[instr][1].Single()];
+              instrToToggle = (int)registers[program[instr][1].Single()];
             }
 
             instrToToggle += instr;

@@ -7,7 +7,7 @@ namespace AdventOfCode2016
   {
     private static void Run()
     {
-      Dictionary<char, int> registers = new Dictionary<char, int> { { 'a', 0 }, { 'b', 0 }, { 'c', 1 }, { 'd', 0 } };
+      var registers = new Dictionary<char, long> { { 'a', 0 }, { 'b', 0 }, { 'c', 1 }, { 'd', 0 } };
 
       new AssembunnyInterpreter().Execute(Input, registers);
 
