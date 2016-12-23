@@ -20,7 +20,7 @@ namespace AdventOfCode2016
       Calculated = 0x10
     }
 
-    private static void Main17()
+    private static void Run()
     {
       var timer = new Stopwatch();
       timer.Start();

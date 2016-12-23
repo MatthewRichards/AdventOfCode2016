@@ -11,7 +11,7 @@ namespace AdventOfCode2016
 {
   class Day5
   {
-    static void Main5()
+    static void Run()
     {
       const string doorId = "ojvtpuvg";
       var password = new char[8];

@@ -11,7 +11,7 @@ namespace AdventOfCode2016
 {
   internal class Day15
   {
-    private static void Main15()
+    private static void Run()
     {
       var initialPositions = new[] {5, 8, 1, 7, 1, 0, 0};
       var limitPositions = new[] {17, 19, 7, 13, 5, 3, 11};

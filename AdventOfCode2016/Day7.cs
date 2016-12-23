@@ -11,7 +11,7 @@ namespace AdventOfCode2016
 {
   class Day7
   {
-    static void Main7()
+    static void Run()
     {
       var examples = Examples.SplitLines();
       examples.Where(IsSSL).ToList().ForEach(Console.WriteLine);

@@ -11,7 +11,7 @@ namespace AdventOfCode2016
 {
   internal class Day16
   {
-    private static void Main16()
+    private static void Run()
     {
       const string input = "11101000110010100";
       const int diskLength = 35651584;

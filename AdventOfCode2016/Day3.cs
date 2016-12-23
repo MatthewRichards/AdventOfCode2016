@@ -8,7 +8,7 @@ namespace AdventOfCode2016
 {
   class Day3
   {
-    static void Main3(string[] args)
+    static void Run()
     {
       var lines = Input.SplitLines().Select(line => line.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries)).ToList();
 

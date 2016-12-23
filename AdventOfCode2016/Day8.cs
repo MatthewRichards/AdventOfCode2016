@@ -11,7 +11,7 @@ namespace AdventOfCode2016
 {
   internal class Day8
   {
-    private static void Main8()
+    private static void Run()
     {
       var emptyGrid = new bool[6].Select(_ => new bool[50]).ToArray();
 

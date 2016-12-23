@@ -1,24 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace AdventOfCode2016
 {
   internal class Day12
   {
-    private static void Main12()
+    private static void Run()
     {
       Dictionary<char, int> registers = new Dictionary<char, int> { { 'a', 0 }, { 'b', 0 }, { 'c', 1 }, { 'd', 0 } };
 
       new AssembunnyInterpreter().Execute(Input, registers);
 
       Console.WriteLine(registers['a']);
-      Console.ReadKey();
     }
 
     private const string Input = @"cpy 1 a

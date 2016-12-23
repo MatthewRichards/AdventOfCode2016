@@ -9,7 +9,7 @@ namespace AdventOfCode2016
 {
   class Day4
   {
-    static void Main4(string[] args)
+    static void Run()
     {
       var rooms = Input.SplitLines()
         .Select(line => Matcher.Match(line))
