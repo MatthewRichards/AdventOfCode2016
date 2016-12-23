@@ -25,7 +25,10 @@ namespace AdventOfCode2016
             }
 
             var targetRegister = program[instr][2].Single();
-            registers[targetRegister] = sourceValue;
+            if (registers.ContainsKey(targetRegister))
+            {
+              registers[targetRegister] = sourceValue;
+            }
             break;
 
           case "inc":
@@ -48,7 +51,37 @@ namespace AdventOfCode2016
 
             if (valueToTest != 0)
             {
-              nextInstr = instr + int.Parse(program[instr][2]);
+              int jump;
+              if (!int.TryParse(program[instr][2], out jump))
+              {
+                jump = registers[program[instr][2].Single()];
+              }
+              nextInstr = instr + jump;
+            }
+            break;
+
+          case "tgl":
+            int instrToToggle;
+            if (!int.TryParse(program[instr][1], out instrToToggle))
+            {
+              instrToToggle = registers[program[instr][1].Single()];
+            }
+
+            instrToToggle += instr;
+            if (instrToToggle < 0 || instrToToggle >= program.Length)
+            {
+              break;
+            }
+
+            if (program[instrToToggle].Length == 2)
+            {
+              program[instrToToggle][0] =
+                program[instrToToggle][0] == "inc" ? "dec" : "inc";
+            }
+            else
+            {
+              program[instrToToggle][0] =
+                program[instrToToggle][0] == "jnz" ? "cpy" : "jnz";
             }
             break;
         }
