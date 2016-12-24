@@ -19,6 +19,8 @@ namespace AdventOfCode2016
       squaresToCheck.Enqueue(start);
       squaresInCheckList.Add(start);
 
+      int shortestRoute = int.MaxValue;
+
       while (squaresToCheck.Count > 0)
       {
         var squareToCheck = squaresToCheck.Dequeue();
@@ -56,6 +58,26 @@ namespace AdventOfCode2016
             }
           }
 
+          if (neighbourMinDistances.ContainsKey(targets))
+          {
+            var there = neighbourMinDistances[targets];
+
+            if (there > shortestRoute)
+            {
+              // That'll do - we can't possibly find a shorter there-and-back route any more
+              squaresToCheck.Clear();
+              break;
+            }
+
+            var backAgain = neighbourMinDistances.Values.Min();
+
+            if (there + backAgain < shortestRoute)
+            {
+              shortestRoute = there + backAgain;
+              Console.WriteLine($"Shortest route so far: {shortestRoute}");
+            }
+          }
+
           if (isShorterRoute && !squaresInCheckList.Contains(neighbour))
           {
             squaresToCheck.Enqueue(neighbour);
@@ -63,28 +85,7 @@ namespace AdventOfCode2016
           }
         }
       }
-
-      int shortestRoute = int.MaxValue;
-
-      for (int x = 0; x < map.GetLength(0); x++)
-      {
-        for (int y = 0; y < map.GetLength(1); y++)
-        {
-          if (map[x, y].MinDistances == null || !map[x, y].MinDistances.ContainsKey(targets))
-          {
-            continue;
-          }
-
-          var there = map[x, y].MinDistances[targets];
-          var backAgain = map[x, y].MinDistances.Values.Min();
-
-          if (there + backAgain < shortestRoute)
-          {
-            shortestRoute = there + backAgain;
-          }
-        }
-      }
-
+      
       Console.WriteLine($"Shortest route and back: {shortestRoute}");
     }
 
