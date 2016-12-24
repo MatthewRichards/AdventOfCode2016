@@ -48,12 +48,6 @@ namespace AdventOfCode2016
               ventCombo |= (1 << map[neighbour.Item1, neighbour.Item2].VentNumber.Value);
             }
 
-            if (ventCombo == targets)
-            {
-              Console.WriteLine($"Found route to target! Distance {newDistance}");
-              return;
-            }
-
             if (!neighbourMinDistances.ContainsKey(ventCombo) ||
               neighbourMinDistances[ventCombo] >= newDistance)
             { 
@@ -70,6 +64,28 @@ namespace AdventOfCode2016
         }
       }
 
+      int shortestRoute = int.MaxValue;
+
+      for (int x = 0; x < map.GetLength(0); x++)
+      {
+        for (int y = 0; y < map.GetLength(1); y++)
+        {
+          if (map[x, y].MinDistances == null || !map[x, y].MinDistances.ContainsKey(targets))
+          {
+            continue;
+          }
+
+          var there = map[x, y].MinDistances[targets];
+          var backAgain = map[x, y].MinDistances.Values.Min();
+
+          if (there + backAgain < shortestRoute)
+          {
+            shortestRoute = there + backAgain;
+          }
+        }
+      }
+
+      Console.WriteLine($"Shortest route and back: {shortestRoute}");
     }
 
     private static IEnumerable<Tuple<int, int>> AdjacentSquares(Tuple<int, int> location, MapSquare[,] map)
