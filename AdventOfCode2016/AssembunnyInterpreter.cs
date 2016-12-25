@@ -5,8 +5,12 @@ namespace AdventOfCode2016
 {
   class AssembunnyInterpreter
   {
+    public IEnumerable<int> RequiredOutput = null;
+
     public void Execute(string input, Dictionary<char, long> registers)
     {
+      var outputEnumerator = RequiredOutput == null ? null : RequiredOutput.GetEnumerator();
+
       var program = input.SplitLines().Select(line => line.Split(' ')).ToArray();
       int instr = 0;
 
@@ -16,6 +20,20 @@ namespace AdventOfCode2016
 
         switch (program[instr][0])
         {
+          case "out":
+            long output;
+            if (!long.TryParse(program[instr][1], out output))
+            {
+              output = registers[program[instr][1].Single()];
+            }
+
+            outputEnumerator.MoveNext();
+            if (outputEnumerator.Current != output)
+            {
+              return;
+            }
+            break;
+
           case "nop":
             break;
 
